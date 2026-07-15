@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +8,240 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-    <script defer src="app.js"></script>
-</head>
 
+    <style>
+        :root {
+            --bg-color: #0d0d14;
+            --bg-panel: #13131e;
+            --bg-card: #1a1a2a;
+            --border-color: #2a2a40;
+            --text-primary: #e8e8f4;
+            --text-secondary: #7a7a9a;
+            --accent-blue: #4a9eff;
+            --accent-purple: #b04aff;
+            --accent-green: #4affb4;
+            --accent-red: #ff4a6e;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* ── Header ── */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 2rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .logo h1 {
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-indicator {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            background: rgba(74,158,255,0.1);
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(74,158,255,0.4); }
+            50%       { box-shadow: 0 0 0 6px rgba(74,158,255,0); }
+        }
+
+        /* ── Layout ── */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .panel:hover {
+            border-color: rgba(74,158,255,0.35);
+            box-shadow: 0 0 24px rgba(74,158,255,0.07);
+        }
+
+        /* ── Video ── */
+        .video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            position: relative;
+            background: #000;
+        }
+
+        #webcam {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+            border-radius: 16px;
+            display: block;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            transform: scaleX(-1);
+        }
+
+        .video-overlay-text {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: rgba(0,0,0,0.65);
+            color: var(--accent-green);
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: 1px solid var(--accent-green);
+        }
+
+        /* ── Dashboard ── */
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .dashboard-card {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .dashboard-card h2 {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* ── Emotion Card ── */
+        .emotion-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-top: 0.5rem;
+        }
+
+        .emotion-display .emoji {
+            font-size: 3.2rem;
+            line-height: 1;
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.15s ease;
+        }
+
+        .emotion-display .label {
+            font-size: 1.75rem;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+
+        /* ── Intent Card ── */
+        .intent-display {
+            padding: 1rem 1.2rem;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-blue);
+            margin-top: 0.5rem;
+        }
+
+        .intent-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+        }
+
+        /* ── Transcript ── */
+        .transcript-card { flex: 1; }
+
+        .transcript-box {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            height: 110px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            margin-top: 0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+
+        .transcript-box::-webkit-scrollbar { width: 4px; }
+        .transcript-box::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+        .placeholder-text {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .main-content { grid-template-columns: 1fr; }
+            .video-container { min-height: 300px; }
+            body { padding: 1rem; }
+        }
+    </style>
+</head>
 <body>
     <div class="app-container">
         <!-- Header -->
@@ -63,6 +292,162 @@
             </div>
         </main>
     </div>
-</body>
 
+    <script>
+        // DOM Elements
+        const video       = document.getElementById('webcam');
+        const statusEl    = document.getElementById('system-status');
+        const emotionEmoji = document.querySelector('.emotion-display .emoji');
+        const emotionLabel = document.querySelector('.emotion-display .label');
+        const intentDisplay = document.querySelector('.intent-text');
+        const transcriptBox = document.getElementById('transcript-box');
+        const overlayCanvas = document.getElementById('overlay');
+
+        const MODEL_URL = './models';
+
+        // ── Load Models ──────────────────────────────────────────────────────
+        async function loadModels() {
+            statusEl.innerText = 'Loading AI Models...';
+            try {
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+                statusEl.innerText = 'Starting Camera...';
+                startVideo();
+            } catch (e) {
+                console.error(e);
+                statusEl.innerText = 'Error loading models';
+            }
+        }
+
+        // ── Start Camera ─────────────────────────────────────────────────────
+        function startVideo() {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(stream => {
+                    video.srcObject = new MediaStream(stream.getVideoTracks());
+                    statusEl.innerText = 'System Active';
+                    statusEl.style.borderColor = 'var(--accent-green)';
+                    statusEl.style.color = 'var(--accent-green)';
+                    statusEl.style.background = 'rgba(74,255,180,0.08)';
+                    startSpeechRecognition(stream);
+                })
+                .catch(err => {
+                    console.error(err);
+                    statusEl.innerText = 'Camera/Mic Denied';
+                    statusEl.style.borderColor = 'var(--accent-red)';
+                    statusEl.style.color = 'var(--accent-red)';
+                });
+        }
+
+        // ── Face Detection Loop ───────────────────────────────────────────────
+        video.addEventListener('play', () => {
+            const displaySize = { width: video.videoWidth, height: video.videoHeight };
+            faceapi.matchDimensions(overlayCanvas, displaySize);
+
+            setInterval(async () => {
+                if (video.paused || video.ended) return;
+                const detections = await faceapi
+                    .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                    .withFaceExpressions();
+                if (detections.length > 0) {
+                    const expressions = detections[0].expressions;
+                    const topEmotion = Object.keys(expressions).reduce((a, b) =>
+                        expressions[a] > expressions[b] ? a : b);
+                    updateEmotionUI(topEmotion);
+                }
+            }, 500);
+        });
+
+        // ── Emotion UI ───────────────────────────────────────────────────────
+        const emotionMap = {
+            neutral:   { emoji: '😐', label: 'Neutral',   color: 'var(--text-primary)' },
+            happy:     { emoji: '😊', label: 'Happy',     color: 'var(--accent-green)' },
+            sad:       { emoji: '😢', label: 'Sad',       color: 'var(--accent-blue)' },
+            angry:     { emoji: '😠', label: 'Angry',     color: 'var(--accent-red)' },
+            fearful:   { emoji: '😨', label: 'Fearful',   color: 'var(--accent-purple)' },
+            disgusted: { emoji: '🤢', label: 'Disgusted', color: 'var(--accent-green)' },
+            surprised: { emoji: '😲', label: 'Surprised', color: 'var(--accent-blue)' }
+        };
+
+        let currentEmotion = '';
+        function updateEmotionUI(emotion) {
+            if (emotion === currentEmotion) return;
+            currentEmotion = emotion;
+            const data = emotionMap[emotion] || emotionMap.neutral;
+
+            emotionEmoji.style.transform = 'scale(0.8) translateY(-10px)';
+            emotionEmoji.style.opacity = '0';
+
+            setTimeout(() => {
+                emotionEmoji.innerText = data.emoji;
+                emotionLabel.innerText = data.label;
+                emotionLabel.style.color = data.color;
+                emotionEmoji.style.transform = 'scale(1.2) translateY(0)';
+                emotionEmoji.style.opacity = '1';
+                setTimeout(() => { emotionEmoji.style.transform = 'scale(1)'; }, 150);
+            }, 150);
+        }
+
+        // ── Speech Recognition ───────────────────────────────────────────────
+        function startSpeechRecognition() {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) {
+                transcriptBox.innerHTML = "<p class='placeholder-text'>Speech not supported. Use Chrome.</p>";
+                return;
+            }
+
+            const recognition = new SR();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            let finalTranscript = '';
+
+            recognition.onresult = (event) => {
+                let interim = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript + ' ';
+                        estimateIntent(event.results[i][0].transcript);
+                    } else {
+                        interim += event.results[i][0].transcript;
+                    }
+                }
+                transcriptBox.innerHTML = `
+                    <span style="color:var(--text-primary);font-weight:600">${finalTranscript}</span>
+                    <span style="color:var(--text-secondary)">${interim}</span>
+                `;
+                transcriptBox.scrollTop = transcriptBox.scrollHeight;
+            };
+
+            recognition.onerror = (e) => console.error('Speech error:', e.error);
+            recognition.onend   = () => recognition.start();
+            recognition.start();
+        }
+
+        // ── Intent Estimation ────────────────────────────────────────────────
+        function estimateIntent(text) {
+            text = text.toLowerCase();
+            let intent = 'Informing', color = 'var(--text-primary)';
+
+            if (['can you','could you','please','help','i need','want to'].some(k => text.includes(k))) {
+                intent = 'Requesting Assistance'; color = 'var(--accent-blue)';
+            } else if (['hello','hi','hey','good morning','good afternoon'].some(k => text.includes(k))) {
+                intent = 'Greeting'; color = 'var(--accent-green)';
+            } else if (['no','disagree',"don't think",'wrong','but'].some(k => text.includes(k))) {
+                intent = 'Disagreeing / Defending'; color = 'var(--accent-red)';
+            } else if (['yes','agree','exactly','right','sure'].some(k => text.includes(k))) {
+                intent = 'Agreeing / Validating'; color = 'var(--accent-purple)';
+            }
+
+            intentDisplay.innerText = intent;
+            intentDisplay.style.color = color;
+
+            const card = intentDisplay.parentElement;
+            card.style.transform = 'scale(1.02)';
+            setTimeout(() => { card.style.transform = 'scale(1)'; }, 200);
+        }
+
+        // ── Boot ─────────────────────────────────────────────────────────────
+        window.onload = loadModels;
+    </script>
+</body>
 </html>
